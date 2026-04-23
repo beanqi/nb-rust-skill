@@ -1,6 +1,6 @@
 ---
 name: nb-rust
-description: rust coding, code review, and performance-oriented implementation workflow for codex-style tasks. use when working in a rust codebase to clarify requirements, propose a simple design, plan a minimal diff, and produce direct code or patch-ready edits for new features, bug fixes, reviews, refactors, or performance tuning. prioritize simplicity, readability, small diffs, no unit tests, necessary comments only, and high-performance rust with careful thread models, low lock contention, low allocation pressure, and minimal string churn.
+description: coding, code review, and performance-oriented implementation workflow for codex-style tasks. use when working in a codebase to clarify requirements, propose a simple design, plan a minimal diff, and produce direct code or patch-ready edits for new features, bug fixes, reviews, refactors, or performance tuning. prioritize simplicity, readability, small diffs, no unit tests, necessary comments only, and high-performance rust with careful thread models, low lock contention, low allocation pressure, and minimal string churn.
 ---
 
 # NB Rust
@@ -103,6 +103,7 @@ Use this default structure unless the user asks for something else.
 - Do not refactor unrelated modules.
 - Do not replace working code with a broad rewrite when a local change is enough.
 - Do not add a new crate or helper layer silently.
+- Do not run code formatting commands (for example, cargo fmt) unless the user explicitly asks.
 - Do not pad the answer with generic Rust advice that does not change the implementation.
 
 ## Finishing touch
