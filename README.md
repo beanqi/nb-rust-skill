@@ -26,7 +26,7 @@
 ```bash
 mkdir -p ~/codex-skills
 cd ~/codex-skills
-git clone git@github.com:beanqi/nb-rust-skill.git nb-rust
+git clone https://github.com/beanqi/nb-rust-skill.git nb-rust
 
 mkdir -p ~/.codex/skills
 ln -s ~/codex-skills/nb-rust ~/.codex/skills/nb-rust
@@ -39,7 +39,7 @@ ln -s ~/codex-skills/nb-rust ~/.codex/skills/nb-rust
 ```powershell
 New-Item -ItemType Directory -Force -Path "$HOME\codex-skills" | Out-Null
 Set-Location "$HOME\codex-skills"
-git clone git@github.com:beanqi/nb-rust-skill.git nb-rust
+git clone https://github.com/beanqi/nb-rust-skill.git nb-rust
 
 New-Item -ItemType Directory -Force -Path "$HOME\.codex\skills" | Out-Null
 New-Item -ItemType SymbolicLink -Path "$HOME\.codex\skills\nb-rust" -Target "$HOME\codex-skills\nb-rust"
