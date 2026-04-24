@@ -25,7 +25,8 @@ This skill is optimized for:
 5. Make performance decisions explicit when they affect hot paths, memory, locks, or thread boundaries.
 6. Avoid over-defensive programming; for simple features, keep the implementation simple and direct.
 7. Keep code short and easy to read; if the logic must grow, split it into reasonable modules and use an appropriate design pattern.
-8. Keep explanations concise and in the user's language; keep Rust code and APIs in English.
+8. Write necessary code comments in Chinese; keep Rust code and APIs in English.
+9. Keep explanations concise and in the user's language; keep Rust code and APIs in English.
 
 ## Default Workflow
 
@@ -69,7 +70,7 @@ The plan should:
 - Match existing style and module layout.
 - Prefer concrete functions and structs over traits, builders, macros, or generic frameworks.
 - Keep functions and modules compact; when logic becomes long, extract cohesive helpers or modules instead of piling everything into one place.
-- Add comments only for non-obvious invariants, concurrency assumptions, unsafe requirements, or surprising performance choices.
+- Add Chinese comments for important design intent, module flow, key functions, key fields, non-obvious invariants, concurrency assumptions, unsafe requirements, or surprising performance choices.
 - Do not add tests, dependencies, or formatting-only changes unless requested or clearly required by the repository task.
 
 ### 5. Validate
@@ -114,6 +115,13 @@ The plan should:
 - Use `DashMap`, sharding, or specialized concurrent structures only when real concurrent access justifies them and the crate is already available or explicitly justified.
 - Use channels such as `crossbeam-channel` only when latency or existing project conventions justify them.
 - Do not add a dependency silently; explain why it is needed and why existing options are insufficient.
+
+### Comments
+
+- For a complete new module or substantial module rewrite, add Chinese module-level comments explaining the design idea, responsibility boundaries, and overall architecture or data flow.
+- For small or local changes, add Chinese comments only on key code paths, key functions, key fields, important state transitions, or non-obvious decisions.
+- Keep comments practical and close to the code they explain; avoid translating obvious Rust syntax or restating the function name.
+- Prefer comments that explain why the code is shaped this way over comments that merely describe what each line does.
 
 ### Unsafe
 
