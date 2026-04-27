@@ -25,12 +25,14 @@ This skill is optimized for:
 5. Make performance decisions explicit when they affect hot paths, memory, locks, or thread boundaries.
 6. Avoid over-defensive programming; for simple features, keep the implementation simple and direct.
 7. Keep code short and easy to read; if the logic must grow, split it into reasonable modules and use an appropriate design pattern.
-8. Write necessary code comments in Chinese; keep Rust code and APIs in English.
-9. Keep explanations concise and in the user's language; keep Rust code and APIs in English.
+8. Keep explanations concise and in the user's language; keep Rust code and APIs in English.
+9. For implementation work, present the proposed design first and wait for explicit user confirmation before planning or editing, so rework is caught early.
 
 ## Default Workflow
 
 Follow this order for implementation or review tasks.
+
+For implementation work, stop after **Design** and wait for explicit user confirmation before continuing to **Plan**, **Implement**, or **Validate**. For review-only work, continue directly to findings without adding an approval pause.
 
 ### 1. Understand
 
@@ -53,9 +55,15 @@ Cover only the relevant points:
 
 Explicitly avoid speculative extension points, unused generic layers, and future-proofing that the task does not require.
 
+Then:
+
+- Present the design to the user in a short, concrete form.
+- Ask for explicit confirmation before moving on.
+- If the user requests changes, revise the design first instead of pushing ahead.
+
 ### 3. Plan
 
-Create a minimal change plan when the work has multiple steps or files.
+After the design is confirmed, create a minimal change plan when the work has multiple steps or files.
 
 The plan should:
 
@@ -66,6 +74,7 @@ The plan should:
 
 ### 4. Implement
 
+- Start implementation only after the user confirms the design.
 - Edit directly and keep the diff focused.
 - Match existing style and module layout.
 - Prefer concrete functions and structs over traits, builders, macros, or generic frameworks.
@@ -151,6 +160,7 @@ Adapt to the user's request, but keep this default structure for larger coding t
 
 - **Assumptions**: brief scope and behavior assumptions, only if useful.
 - **Design**: chosen approach and relevant Rust tradeoffs.
+- For implementation tasks, stop here and get user confirmation before continuing.
 - **Plan**: minimal file/module changes.
 - **Implementation**: direct edits, patch summary, or code snippets.
 - **Validation**: commands run or commands the user should run.
