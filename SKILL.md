@@ -1,188 +1,61 @@
 ---
 name: nb-rust
-description: Use for Rust coding, code review, bug fixes, refactors, performance tuning, and implementation planning in an existing codebase. Guides the model to clarify only when needed, choose the simplest correct design, make small focused diffs, avoid speculative abstraction, and treat Rust performance, allocation, locking, and thread models deliberately.
+description: Use for Rust coding, code review, bug fixes, refactors, and performance-aware implementation in existing codebases. Before writing code, Codex must briefly explain its approach and wait for user confirmation. Keep code and architecture simple, consider performance where relevant, avoid unit tests by default, and add useful comments.
 ---
 
 # NB Rust
 
-## Purpose
+## Goal
 
-Help Codex work on Rust codebases like a practical senior engineer: understand the real requirement, choose the simplest correct design, change only what is necessary, and keep performance tradeoffs explicit.
+Help Codex make Rust changes in existing repositories with a simple design, a focused diff, and clear performance awareness.
 
-This skill is optimized for:
+## Workflow
 
-- Rust feature work, bug fixes, refactors, and code review.
-- Performance-sensitive implementation and optimization.
-- Small, patch-ready changes in existing repositories.
-- Clear reasoning about ownership, allocation, locking, and concurrency.
+For implementation tasks:
 
-## Operating Principles
+1. Inspect the relevant code first.
+2. Before editing, explain the proposed approach and wait for explicit user confirmation.
+3. Keep the explanation concrete and short: likely files or modules, core data flow, ownership shape, error handling, and any performance-sensitive choices.
+4. If the user adjusts the direction, revise the approach before writing code.
+5. After confirmation, implement the change directly and keep the diff narrow.
+6. Validate with compile-focused checks such as `cargo check` when useful. Do not add unit tests unless the user explicitly asks.
 
-1. Solve the actual task, not a larger imagined task.
-2. Prefer the smallest correct diff over broad rewrites.
-3. Reuse existing architecture, naming, helpers, and crate choices first.
-4. Add abstractions only when they remove real repetition or match established project style.
-5. Make performance decisions explicit when they affect hot paths, memory, locks, or thread boundaries.
-6. Avoid over-defensive programming; for simple features, keep the implementation simple and direct.
-7. Keep code short and easy to read; if the logic must grow, split it into reasonable modules and use an appropriate design pattern.
-8. Keep explanations concise and in the user's language; keep Rust code and APIs in English.
-9. For implementation work, present the proposed design first and wait for explicit user confirmation before planning or editing, so rework is caught early.
+For review-only tasks, do not wait for confirmation before giving findings.
 
-## Default Workflow
+## Implementation Rules
 
-Follow this order for implementation or review tasks.
+- Prefer the existing architecture, naming, helpers, and crate choices.
+- Keep code and architecture simple. Add abstractions only when they clearly reduce complexity or match the surrounding code.
+- Preserve public APIs unless the task requires changing them.
+- Avoid unrelated refactors, broad rewrites, formatting-only churn, and speculative future-proofing.
+- Do not add new dependencies, background tasks, global state, traits, macros, or builders without a clear reason.
+- Do not create unit tests by default.
+- Add practical Chinese comments for important modules, functions, fields, invariants, concurrency assumptions, unsafe requirements, or non-obvious performance decisions.
+- Do not comment obvious syntax or restate what each line already says.
 
-For implementation work, stop after **Design** and wait for explicit user confirmation before continuing to **Plan**, **Implement**, or **Validate**. For review-only work, continue directly to findings without adding an approval pause.
+## Rust Performance Guidance
 
-### 1. Understand
-
-- Inspect the relevant files before proposing changes.
-- Ask short, concrete questions only when behavior, scope, API shape, or performance targets are genuinely ambiguous.
-- If the task is actionable, state key assumptions briefly and continue.
-- Do not block on questions whose answers can be inferred safely from the repository.
-
-### 2. Design
-
-Before editing, decide the simplest design that fits the current codebase.
-
-Cover only the relevant points:
-
-- Data flow and API boundaries.
-- Ownership and lifetime shape.
-- Error handling behavior.
-- Thread, async, channel, or shared-state model.
-- Hot-path allocation, cloning, parsing, hashing, and lookup costs.
-
-Explicitly avoid speculative extension points, unused generic layers, and future-proofing that the task does not require.
-
-Then:
-
-- Present the design to the user in a short, concrete form.
-- Ask for explicit confirmation before moving on.
-- If the user requests changes, revise the design first instead of pushing ahead.
-
-### 3. Plan
-
-After the design is confirmed, create a minimal change plan when the work has multiple steps or files.
-
-The plan should:
-
-- Name the files or modules likely to change.
-- Separate required changes from optional validation.
-- Call out any new crate, trait, macro, background task, or shared state before adding it.
-- Keep unrelated cleanup, renames, and formatting churn out of scope.
-
-### 4. Implement
-
-- Start implementation only after the user confirms the design.
-- Edit directly and keep the diff focused.
-- Match existing style and module layout.
-- Prefer concrete functions and structs over traits, builders, macros, or generic frameworks.
-- Keep functions and modules compact; when logic becomes long, extract cohesive helpers or modules instead of piling everything into one place.
-- Add Chinese comments for important design intent, module flow, key functions, key fields, non-obvious invariants, concurrency assumptions, unsafe requirements, or surprising performance choices.
-- Do not add tests, dependencies, or formatting-only changes unless requested or clearly required by the repository task.
-
-### 5. Validate
-
-- Prefer targeted checks such as `cargo check`, or a small compile-focused command.
-- Do not run broad or expensive validation if the user is still iterating and has not asked for it.
-- If validation is skipped, say exactly what should be run next.
-- Do not fix unrelated failures discovered during validation; report them separately.
-
-## Rust Decision Rules
-
-### Simplicity
-
-- Use the standard library when it is sufficient.
-- Keep state transitions explicit and local.
-- For simple features, prefer straightforward happy-path code with only the necessary validation and error handling.
-- Prefer readable decomposition over long functions; use design patterns only when they reduce complexity for the current logic.
-- Prefer local ownership over shared mutable state.
-- Prefer direct control flow over callback-heavy or trait-heavy designs.
-- Preserve public APIs unless the user asked to change them.
-
-### Allocation And Strings
-
-- Avoid unnecessary `String`, `format!`, `to_string`, `clone`, and temporary `Vec` creation on hot paths.
-- Prefer `&str`, slices, iterators, borrowed keys, and reused buffers when this stays readable.
-- Hoist repeated parsing, conversion, hashing, or map lookups out of loops when practical.
-- Avoid optimizing cold paths if it makes the code harder to understand.
-
-### Concurrency And Async
-
-- Choose the thread or async model deliberately before coding.
-- Minimize shared mutable state; partition ownership when possible.
-- Keep lock scope short and avoid nested locks.
-- Never hold locks across `.await` unless the guard type and code path are explicitly designed for it.
-- Use message passing when it simplifies ownership or reduces contention.
-- Use `Arc` deliberately; avoid clone-heavy fanout in hot paths.
-- Prefer a single-threaded or local-state design when concurrency is not actually needed.
-
-### Data Structures And Crates
-
-- Start with simple standard-library data structures.
-- Use `DashMap`, sharding, or specialized concurrent structures only when real concurrent access justifies them and the crate is already available or explicitly justified.
-- Use channels such as `crossbeam-channel` only when latency or existing project conventions justify them.
-- Do not add a dependency silently; explain why it is needed and why existing options are insufficient.
-
-### Comments
-
-- For a complete new module or substantial module rewrite, add Chinese module-level comments explaining the design idea, responsibility boundaries, and overall architecture or data flow.
-- For small or local changes, add Chinese comments only on key code paths, key functions, key fields, important state transitions, or non-obvious decisions.
-- Keep comments practical and close to the code they explain; avoid translating obvious Rust syntax or restating the function name.
-- Prefer comments that explain why the code is shaped this way over comments that merely describe what each line does.
-
-### Unsafe
-
-- Do not add `unsafe` for speculative speedups.
-- Use `unsafe` only when necessary for the task and when safe Rust is not practical.
-- When using `unsafe`, state the invariants that make it sound.
+- Treat ownership, allocation, locking, async boundaries, and thread boundaries deliberately.
+- Avoid unnecessary `String`, `format!`, `to_string`, `clone`, temporary `Vec`, repeated parsing, repeated hashing, and repeated map lookups on hot paths.
+- Prefer borrowed data, slices, iterators, local ownership, and reused buffers when this stays readable.
+- Keep lock scope short, avoid nested locks, and do not hold locks across `.await` unless the code is explicitly designed for it.
+- Prefer standard-library data structures first. Use specialized concurrent structures or new crates only when the need is clear.
+- Do not make cold paths harder to read for minor performance gains.
 
 ## Review Guidance
 
-For code review, prioritize findings in this order:
+For code review, prioritize:
 
-1. Correctness, data races, deadlocks, panics, lost errors, and API contract violations.
-2. Performance issues in real hot paths: allocation churn, clone-heavy code, repeated parsing, broad locks, blocking in async, and avoidable map lookups.
-3. Maintainability issues that directly affect this change: unclear ownership, unnecessary abstraction, surprising control flow, or inconsistent project style.
+1. Correctness issues, panics, lost errors, data races, deadlocks, and API contract violations.
+2. Real performance risks such as allocation churn, clone-heavy hot paths, broad locks, blocking in async, and avoidable repeated work.
+3. Maintainability issues that directly affect the current change.
 
-For each finding, include:
-
-- The concrete risk.
-- The smallest practical fix.
-- Whether the issue is correctness, performance, or maintainability.
-
-Do not pad reviews with generic Rust advice.
-
-## Response Shape
-
-Adapt to the user's request, but keep this default structure for larger coding tasks:
-
-- **Assumptions**: brief scope and behavior assumptions, only if useful.
-- **Design**: chosen approach and relevant Rust tradeoffs.
-- For implementation tasks, stop here and get user confirmation before continuing.
-- **Plan**: minimal file/module changes.
-- **Implementation**: direct edits, patch summary, or code snippets.
-- **Validation**: commands run or commands the user should run.
-
-For small tasks, skip unnecessary sections and answer directly.
-
-## Hard Constraints
-
-- Do not add unit tests by default.
-- Do not introduce new abstractions, dependencies, background tasks, or global state without a clear reason.
-- Do not refactor unrelated modules.
-- Do not add defensive branches, fallback paths, validation layers, or error wrappers that the current requirement does not need.
-- Do not rename broadly unless required.
-- Do not perform formatting-only churn unless requested.
-- Do not run `cargo fmt` unless requested.
-- Do not replace working code with a broad rewrite when a local fix is enough.
-- Do not write long generic explanations when a concrete patch or finding is more useful.
+For each finding, include the concrete risk and the smallest practical fix. Avoid generic Rust advice.
 
 ## Final Handoff
 
-End with a concise handoff:
+End with:
 
 - What changed or what was found.
 - What validation was run, or what remains to run.
-- Any important performance, locking, ownership, or API assumption the user should verify.
+- Any important performance, ownership, locking, or API assumption the user should verify.
