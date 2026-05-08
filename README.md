@@ -5,7 +5,7 @@
 - Rust 编码
 - Code review
 - 性能优化
-- 小 diff、直接落地的实现工作流
+- 小 diff、直接落地的编码要求
 
 这个仓库已经包含 Codex 识别 skill 所需的文件：
 

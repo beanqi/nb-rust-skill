@@ -1,4 +1,4 @@
 interface:
   display_name: "NB Rust"
   short_description: "Focused Rust coding and performance review"
-  default_prompt: "Use $nb-rust to propose a small, performance-aware Rust design, wait for user confirmation, then implement with a focused validation plan."
+  default_prompt: "Use $nb-rust for focused Rust coding or review with simple architecture, narrow diffs, performance awareness, and useful comments."
